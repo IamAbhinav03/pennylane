@@ -84,8 +84,11 @@ class DefaultQubitTorch(DefaultQubit):
             switching device to ``default.qubit`` and using ``diff_method="parameter-shift"``.
     """
 
-    name = "Default qubit (TensorFlow) Pennylane plugin"
+    name = "Default qubit (PyTorch) Pennylane plugin"
     short_name = "default.qubit.torch"
+    pennylane_requires = '0.1.0'
+    version = '0.0.1'
+    author = 'Abhinav M. Hari'
 
     parametric_ops = {
         "PhaseShift": torch_ops.PhaseShift,
@@ -120,7 +123,7 @@ class DefaultQubitTorch(DefaultQubit):
     _flatten = staticmethod(lambda tensor: torch.reshape(tensor, [-1])) #not sure
     _gather = staticmethod(torch.gather)
     _einsum = staticmethod(torch.einsum)
-    _cast = staticmethod(torrch.tensor) #also check the torch.to function
+    _cast = staticmethod(torch.tensor) #also check the torch.to function
     _transpose = staticmethod(torch.transpose)
     _tensordot = staticmethod(torch.tensordot)
     _conj = staticmethod(torch.conj)
@@ -131,6 +134,20 @@ class DefaultQubitTorch(DefaultQubit):
     #maybe a extra static method for _asarray like in default_quibt_tf.py
 
     #special apply method
+    @staticmethod
+    def __init__(self, wires, *, shots=None, analytic=None):
+        super().__init__(wires, shots=shots, cache=0, analytic=analytic)
+
+        # prevent using special apply method for this gate due to slowdown in TF implementation
+        del self._apply_ops["CZ"]
+
+        # Versions of TF before 2.3.0 do not support using the special apply methods as they
+        # raise an error when calculating the gradient. For versions of TF after 2.3.0,
+        # special apply methods are also not supported when using more than 8 wires due to
+        # limitations with TF slicing.
+        if not SUPPORTS_APPLY_OPS or self.num_wires > 8:
+            self._apply_ops = {}
+
 
     @classmethod
     def capabilities(cls):

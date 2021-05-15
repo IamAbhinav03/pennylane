@@ -81,3 +81,8 @@ classifiers = [
 ]
 
 setup(classifiers=classifiers, **(info))
+
+devices_list = [
+        'default.qubit.torch = pennylane.devices.default_qubit_torch:DefaultQubitTorch'
+    ],
+setup(entry_points={'pennylane.plugins': devices_list})
