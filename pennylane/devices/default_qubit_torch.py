@@ -1,7 +1,8 @@
 import numpy as np
 from pennylane.operation import DiagonalOperation
-from . import torch_ops.py
+from . import torch_ops
 from . import DefaultQubit
+from pytorch import torch
 
 #code to check the pytorch version
 
@@ -86,7 +87,7 @@ class DefaultQubitTorch(DefaultQubit):
 
     name = "Default qubit (PyTorch) Pennylane plugin"
     short_name = "default.qubit.torch"
-    pennylane_requires = '0.1.0'
+    pennylane_requires = '2'
     version = '0.0.1'
     author = 'Abhinav M. Hari'
 
@@ -135,25 +136,16 @@ class DefaultQubitTorch(DefaultQubit):
 
     #special apply method
     @staticmethod
-    def __init__(self, wires, *, shots=None, analytic=None):
-        super().__init__(wires, shots=shots, cache=0, analytic=analytic)
-
-        # prevent using special apply method for this gate due to slowdown in TF implementation
-        del self._apply_ops["CZ"]
-
-        # Versions of TF before 2.3.0 do not support using the special apply methods as they
-        # raise an error when calculating the gradient. For versions of TF after 2.3.0,
-        # special apply methods are also not supported when using more than 8 wires due to
-        # limitations with TF slicing.
-        if not SUPPORTS_APPLY_OPS or self.num_wires > 8:
-            self._apply_ops = {}
+    def __init__(self, shots=1024, hardware_options=None):
+        super().__init__(wires=24, shots=shots, analytic=False)
+        self.hardware_options = hardware_options
 
 
     @classmethod
     def capabilities(cls):
         capabilities = super().capabilities().copy()
         capabilities.update(
-            passthru_interface="torch"
+            passthru_interface="torch",
             supports_reversible_diff=False
         )
         return capabilities

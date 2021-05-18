@@ -46,7 +46,8 @@ info = {
             'default.qubit.jax = pennylane.devices.default_qubit_jax:DefaultQubitJax',
             'default.tensor = pennylane.beta.devices.default_tensor:DefaultTensor',
             'default.tensor.tf = pennylane.beta.devices.default_tensor_tf:DefaultTensorTF',
-            'default.mixed = pennylane.devices.default_mixed:DefaultMixed'
+            'default.mixed = pennylane.devices.default_mixed:DefaultMixed',
+            'default.qubit.torch = pennylane.devices.default_qubit_torch:DefaultQubitTorch'
             ],
         'console_scripts': [
                 'pl-device-test=pennylane.devices.tests:cli'
@@ -82,7 +83,9 @@ classifiers = [
 
 setup(classifiers=classifiers, **(info))
 
+'''
 devices_list = [
         'default.qubit.torch = pennylane.devices.default_qubit_torch:DefaultQubitTorch'
     ],
-setup(entry_points={'pennylane.plugins': devices_list})
+    setup(entry_points={'pennylane.plugins': devices_list})
+    '''
