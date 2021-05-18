@@ -1,7 +1,8 @@
 import numpy as np
 from pennylane.operation import DiagonalOperation
-from . import torch_ops.py
+from . import torch_ops
 from . import DefaultQubit
+from pytorch import torch
 
 #code to check the pytorch version
 
@@ -84,8 +85,11 @@ class DefaultQubitTorch(DefaultQubit):
             switching device to ``default.qubit`` and using ``diff_method="parameter-shift"``.
     """
 
-    name = "Default qubit (TensorFlow) Pennylane plugin"
+    name = "Default qubit (PyTorch) Pennylane plugin"
     short_name = "default.qubit.torch"
+    pennylane_requires = '2'
+    version = '0.0.1'
+    author = 'Abhinav M. Hari'
 
     parametric_ops = {
         "PhaseShift": torch_ops.PhaseShift,
@@ -120,7 +124,7 @@ class DefaultQubitTorch(DefaultQubit):
     _flatten = staticmethod(lambda tensor: torch.reshape(tensor, [-1])) #not sure
     _gather = staticmethod(torch.gather)
     _einsum = staticmethod(torch.einsum)
-    _cast = staticmethod(torrch.tensor) #also check the torch.to function
+    _cast = staticmethod(torch.tensor) #also check the torch.to function
     _transpose = staticmethod(torch.transpose)
     _tensordot = staticmethod(torch.tensordot)
     _conj = staticmethod(torch.conj)
@@ -131,12 +135,17 @@ class DefaultQubitTorch(DefaultQubit):
     #maybe a extra static method for _asarray like in default_quibt_tf.py
 
     #special apply method
+    @staticmethod
+    def __init__(self, shots=1024, hardware_options=None):
+        super().__init__(wires=24, shots=shots, analytic=False)
+        self.hardware_options = hardware_options
+
 
     @classmethod
     def capabilities(cls):
         capabilities = super().capabilities().copy()
         capabilities.update(
-            passthru_interface="torch"
+            passthru_interface="torch",
             supports_reversible_diff=False
         )
         return capabilities
