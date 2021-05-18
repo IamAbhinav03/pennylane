@@ -89,7 +89,7 @@ class DefaultQubitTorch(DefaultQubit):
     short_name = "default.qubit.torch"
     pennylane_requires = '2'
     version = '0.0.1'
-    author = 'Abhinav M. Hari'
+    author = 'Abhinav M Hari and Daniel Wang'
 
     parametric_ops = {
         "PhaseShift": torch_ops.PhaseShift,
